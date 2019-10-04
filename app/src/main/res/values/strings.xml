@@ -9,4 +9,5 @@
     <string name="hint_text">Type city name</string>
     <string name="read_error">Could not read data</string>
     <string name="connect_error">Could not connect to server</string>
+    <string name="day_description">%1$s: %2$s</string>
 </resources>

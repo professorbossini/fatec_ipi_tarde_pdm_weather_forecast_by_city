@@ -53,4 +53,16 @@ public class Weather {
         );
 
     }
+
+    @Override
+    public String toString() {
+        return "Weather{" +
+                "dayOfWeek='" + dayOfWeek + '\'' +
+                ", description='" + description + '\'' +
+                ", minTemp='" + minTemp + '\'' +
+                ", maxTemp='" + maxTemp + '\'' +
+                ", humidity='" + humidity + '\'' +
+                ", iconURL='" + iconURL + '\'' +
+                '}';
+    }
 }

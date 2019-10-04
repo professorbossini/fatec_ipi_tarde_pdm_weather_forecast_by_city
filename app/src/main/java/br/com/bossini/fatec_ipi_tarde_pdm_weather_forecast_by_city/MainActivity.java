@@ -17,6 +17,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView weatherListView;
     private List<Weather> weatherList;
-
+    private WeatherAdapter adapter;
     private EditText locationEditText;
 
     @Override
@@ -41,10 +45,9 @@ public class MainActivity extends AppCompatActivity {
         weatherListView = findViewById(R.id.weatherListView);
         locationEditText = findViewById(R.id.locationEditText);
         weatherList = new ArrayList<>();
-        ArrayAdapter <Weather> adapter =
-                new ArrayAdapter<Weather>(
+        adapter =
+                new WeatherAdapter(
                         this,
-                        android.R.layout.simple_list_item_1,
                         weatherList
                 );
         weatherListView.setAdapter(adapter);
@@ -90,14 +93,15 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 reader.close();
                                 //locationEditText.getText();
-                                runOnUiThread(()->{
+
+                                /*runOnUiThread(()->{
                                     Toast.makeText(
                                             MainActivity.this,
-                                            "",
+                                            s.toString(),
                                             Toast.LENGTH_LONG
                                     ).show();
-                                });
-
+                                });*/
+                                lidaComJSON(s.toString());
                             }
                             catch (IOException e){
                                 e.printStackTrace();
@@ -115,6 +119,54 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void lidaComJSON (String jsonTextual){
+        //org.json
+        try{
+            JSONObject json = new JSONObject(jsonTextual);
+            JSONArray list = json.getJSONArray("list");
+            for (int i = 0; i < list.length(); i++){
+                JSONObject iesimo = list.getJSONObject(i);
+                long dt = iesimo.getLong("dt");
+                JSONObject main = iesimo.getJSONObject("main");
+                double temp_min = main.getDouble("temp_min");
+                double temp_max = main.getDouble("temp_max");
+                double humidity = main.getDouble("humidity");
+                JSONArray weather = iesimo.getJSONArray("weather");
+                String description =
+                        weather.
+                                getJSONObject(0).
+                                getString("description");
+                String icon =
+                        weather.
+                                getJSONObject(0).
+                                getString("icon");
+                Weather w =
+                        new Weather(
+                                dt,
+                                temp_min,
+                                temp_max,
+                                humidity,
+                                description,
+                                icon
+                        );
+
+                weatherList.add(w);
+
+            }
+            runOnUiThread(
+                    () -> {
+                        adapter.notifyDataSetChanged();
+                    }
+            );
+
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
